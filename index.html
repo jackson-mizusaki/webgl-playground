@@ -9,30 +9,44 @@
 		</style>
 	</head>
 	<body>
-		<script src="js/three.js"></script>
-		<script>
-			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-			
-			var renderer = new THREE.WebGLRenderer();
-			renderer.setSize(window.innerWidth, window.innerHeight);
-			document.body.appendChild(renderer.domElement);
-			
-			var geometry = new THREE.BoxGeometry();
-			var material = new THREE.MeshBasicMaterial({ color: 0x00ff00});
-			var cube = new THREE.Mesh(geometry, material);
-			scene.add(cube);
-			
-			camera.position.z = 5;
-			
-			function animate() {
-				requestAnimationFrame(animate);
-				cube.rotation.x += 0.01;
-				cube.rotation.y += 0.01;
-				renderer.render(scene, camera);
-			}
-			animate();
-			
+		<script id="vertexShader" type="x-shader/x-vertex">#version 300 es
+		out vec2 vUv;
+		void main(){
+			vec4 outPos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+			vUv = uv;
+			gl_Position = vec4(position, 1.0);
+
+		}
 		</script>
+		
+		<script id="fragmentShader" type="x-shader/x-fragment">#version 300 es
+		uniform float u_time;
+		uniform vec2 u_resolution;
+		in vec2 vUv;
+		out vec4 outColor;
+		#define PI 3.1415927
+
+		float plot (vec2 st, float pct){
+			return smoothstep(pct-0.02, pct, st.y) - 
+				   smoothstep(pct, pct+0.02, st.y);
+		}
+		void main()
+		{
+			// Normalized pixel coordinates (from 0 to 1)
+			vec2 st = gl_FragCoord.xy/u_resolution;
+
+
+			float y = smoothstep(0.2,0.5, st.x) - smoothstep(0.5,0.8, st.x);
+			vec3 color = vec3(y);
+
+			float pct = plot(st, y);
+			color = (1.0-pct)*color+pct*vec3(0.0,1.0,0.0);
+			outColor = vec4(color, 1.0);
+		}
+		</script>
+
+	
+		
+		<script type="module" src="/js/main.js"></script>
 	</body>
 </body>
