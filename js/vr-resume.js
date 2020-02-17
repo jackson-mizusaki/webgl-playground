@@ -15,7 +15,7 @@ renderer.setAnimationLoop(animate);
 
 function init(){
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xaaaaaa);
+    scene.background = new THREE.Color(0xaaaabb);
     scene.add( new THREE.AmbientLight( 0x111122 ) );
 
     canvas = document.createElement('canvas');
@@ -28,7 +28,7 @@ function init(){
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.physicallyCorrectLights = true;
+    //renderer.physicallyCorrectLights = true;
     // Add VR button 
     document.body.appendChild(VRButton.createButton(renderer));
     // Add renderer
@@ -44,13 +44,10 @@ function init(){
     light.shadow.mapSize.width = 512;  // default
     light.shadow.mapSize.height = 512; // default
     light.shadow.camera.near = 0.5;       // default
-    light.shadow.camera.far = 500      // default
+    light.shadow.camera.far = 500 ;     // default
     
     scene.add(light);
-    var helper = new THREE.SpotLightHelper(light);
-
-   // var helper = new THREE.CameraHelper( light.shadow.camera );
-    scene.add( helper );
+   
 
    // var geometry = new THREE.SphereBufferGeometry(0.1);
     //var sphereMaterial = new THREE.MeshBasicMaterial(0xff0000);
@@ -74,9 +71,15 @@ function init(){
             objLoader.setModelName(files[i]);
             objLoader.addMaterials(materials);
             objLoader.load('assets/'+files[i]+'.obj', (root) => {
+                //root.material.shadowSide = THREE.DoubleSide;
+                root.traverse( function ( child ) {
+                    if ( child instanceof THREE.Mesh ) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
                 root.castShadow = true;
                 root.receiveShadow = true;  
-
                 i++;
                 loadObjs(i);
                 scene.add(root);					// custom distance material
@@ -125,3 +128,5 @@ function animate(time){
 function createObject(x, y, obj){
 
 }
+
+console.log(scene);
