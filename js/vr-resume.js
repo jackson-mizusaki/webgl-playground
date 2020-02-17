@@ -47,27 +47,31 @@ function init(){
     light.shadow.camera.far = 500 ;     // default
     
     scene.add(light);
-   
-
-   // var geometry = new THREE.SphereBufferGeometry(0.1);
-    //var sphereMaterial = new THREE.MeshBasicMaterial(0xff0000);
-    //var mesh = new THREE.Mesh(geometry, sphereMaterial);
-    //mesh.position.set(0,5,0);
-   // scene.add(mesh);
     
    let objLoader = new OBJLoader2();
     let mtlLoader = new MTLLoader();
     let files = ['Monitor', 'Tower', 'Desk'];
 
+    uniforms = {
+        u_time : {value: 1.0},
+        u_resolution : {value: new THREE.Vector2()},
+    }
     function loadObjs(i){
         if (i > files.length-1){
             return;
         }
         mtlLoader = new MTLLoader();
         objLoader = new OBJLoader2();
+        if (files[i] == 'Desk'){
+            // use shader on desk instead	
+            // let fragShader = document.getElementById('fragmentShader').textContent.trim();
+            // let vertShader = document.getElementById('vertexShader').textContent.trim();
 
-        mtlLoader.load('assets/'+files[i]+'.mtl', (mtlParseResult) => {
-            const materials = MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
+            // set materials manually
+            const materials = {
+                Material: new THREE.MeshPhongMaterial(0xad6e00),
+                Legs: new THREE.MeshPhongMaterial(0x050505)
+            };
             objLoader.setModelName(files[i]);
             objLoader.addMaterials(materials);
             objLoader.load('assets/'+files[i]+'.obj', (root) => {
@@ -83,43 +87,42 @@ function init(){
                 i++;
                 loadObjs(i);
                 scene.add(root);					// custom distance material
-           
-
             });
-        });
+        }
+        else{
+            mtlLoader.load('assets/'+files[i]+'.mtl', (mtlParseResult) => {
+                const materials = MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
+                objLoader.setModelName(files[i]);
+
+                objLoader.addMaterials(materials);
+                objLoader.load('assets/'+files[i]+'.obj', (root) => {
+                    //root.material.shadowSide = THREE.DoubleSide;
+                    root.traverse( function ( child ) {
+                        if ( child instanceof THREE.Mesh ) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    root.castShadow = true;
+                    root.receiveShadow = true;  
+                    i++;
+                    loadObjs(i);
+                    scene.add(root);					// custom distance material
+                });
+            });
+        }
     }
 
     loadObjs(0);
     
-    // mtlLoader.load('assets/Monitor.mtl', (mtlParseResult) => {
-    //     const monitorMaterials = MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-    //     objLoader.setModelName('monitor');
-    //     objLoader.addMaterials(monitorMaterials);
-    //     objLoader.load('assets/Monitor.obj', (r) => {
-    //         scene.add(r);    
-    //         mtlLoader.load('assets/Tower.mtl', (m) => {
-    //             const towerMaterials = MtlObjBridge.addMaterialsFromMtlLoader(m);
-    //             objLoader.setModelName('tower');
-    //             objLoader.addMaterials(towerMaterials);
-    //             objLoader.load('assets/Tower.obj', (a) => {
-    //                 scene.add(a);
-    //                 mtlLoader.load('assets/Desk.mtl', (p) => {
-    //                     const deskMaterials = MtlObjBridge.addMaterialsFromMtlLoader(p);
-    //                     objLoader.setModelName('desk');
-    //                     objLoader.addMaterials(deskMaterials);
-    //                     objLoader.load('assets/Desk.obj', (root) => {
-    //                         scene.add(root);
-    //                     });
-    //                 });
-    //             });
-    //         });
-    //     });
-    // });
-
-
-    
-
+    onWindowResize();
+} 
+function onWindowResize(event){
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    uniforms.u_resolution.value.x = renderer.domElement.width;
+    uniforms.u_resolution.value.y = renderer.domElement.height;
 }
+
 function animate(time){
     renderer.render(scene, camera);
 }
