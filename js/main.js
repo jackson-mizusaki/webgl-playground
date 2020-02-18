@@ -1,11 +1,20 @@
 import * as THREE from '../js/three.module.js';
+import {WEBGL} from './WebGL.js'
 let canvas;
 let camera, scene, renderer;
 let uniforms;
 
 let mesh;
 
-init();
+if (WEBGL.isWebGL2Available()){
+    init();
+    requestAnimationFrame(animate);
+    }
+    else{
+        var warning = WEBGL.getWebGLErrorMessage();
+        document.body.appendChild( warning );
+    
+    }
 //animate();
 function init(){
 	scene = new THREE.Scene();
@@ -63,5 +72,3 @@ function animate(time) {
     mesh.rotation.y += 0.01;
     renderer.render(scene, camera);
 }
-
-requestAnimationFrame(animate);

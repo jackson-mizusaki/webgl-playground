@@ -1,16 +1,22 @@
-import * as THREE from '../js/three.module.js';
-import { VRButton } from '../js/VRButton.js';
-import {OBJLoader2} from '../js/OBJLoader2.js';
-import { MTLLoader } from '../js/MTLLoader.js';
-import {MtlObjBridge} from '../js/obj2/bridge/MtlObjBridge.js';
-
+import * as THREE from './three.module.js';
+import { VRButton } from './VRButton.js';
+import {OBJLoader2} from './OBJLoader2.js';
+import { MTLLoader } from './MTLLoader.js';
+import {MtlObjBridge} from './obj2/bridge/MtlObjBridge.js';
+import {WEBGL} from './WebGL.js'
 let canvas;
 let camera, scene, renderer;
 let uniforms;
 
+if (WEBGL.isWebGLAvailable()){
 init();
 renderer.setAnimationLoop(animate);
+}
+else{
+	var warning = WEBGL.getWebGLErrorMessage();
+	document.body.appendChild( warning );
 
+}
 
 
 function init(){
