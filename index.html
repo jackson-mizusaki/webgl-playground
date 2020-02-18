@@ -14,7 +14,7 @@
 		void main(){
 			vec4 outPos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 			vUv = uv;
-			gl_Position = vec4(position, 1.0);
+			gl_Position = outPos;
 
 		}
 		</script>
@@ -26,27 +26,16 @@
 		out vec4 outColor;
 		#define PI 3.1415927
 
-		float plot (vec2 st, float pct){
-			return smoothstep(pct-0.02, pct, st.y) - 
-				   smoothstep(pct, pct+0.02, st.y);
-		}
 		void main()
 		{
-			// Normalized pixel coordinates (from 0 to 1)
-			vec2 st = gl_FragCoord.xy/u_resolution;
-
-
-			float y = smoothstep(0.2,0.5, st.x) - smoothstep(0.5,0.8, st.x);
-			vec3 color = vec3(y);
-
-			float pct = plot(st, y);
-			color = (1.0-pct)*color+pct*vec3(0.0,1.0,0.0);
-			outColor = vec4(color, 1.0);
+			outColor = vec4(1,1,0,1);
 		}
 		</script>
 
 	
 		
 		<script type="module" src="./js/main.js"></script>
+		<h1>Jackson Mizusaki</h1>
+		<div id="root"></div>
 	</body>
 </body>

@@ -4,9 +4,9 @@ import {OBJLoader2} from '../js/OBJLoader2.js';
 import { MTLLoader } from '../js/MTLLoader.js';
 import {MtlObjBridge} from '../js/obj2/bridge/MtlObjBridge.js';
 
-var canvas;
-var camera, scene, renderer;
-var uniforms;
+let canvas;
+let camera, scene, renderer;
+let uniforms;
 
 init();
 renderer.setAnimationLoop(animate);
@@ -19,7 +19,7 @@ function init(){
     scene.add( new THREE.AmbientLight( 0x111122 ) );
 
     canvas = document.createElement('canvas');
-    var context = canvas.getContext({alpha: false});
+    let context = canvas.getContext({alpha: false});
 
 
     renderer = new THREE.WebGLRenderer({canvas: canvas, context:context});
@@ -38,7 +38,7 @@ function init(){
     camera.position.set(0, 1.6, 3);
     scene.add(camera);
 
-    var light = new THREE.SpotLight(0xffffff, 5, 20);
+    let light = new THREE.SpotLight(0xffffff, 5, 20);
     light.position.set(0,3,0);
     light.castShadow = true;
     light.shadow.mapSize.width = 512;  // default
@@ -48,7 +48,7 @@ function init(){
     
     scene.add(light);
     
-   let objLoader = new OBJLoader2();
+    let objLoader = new OBJLoader2();
     let mtlLoader = new MTLLoader();
     let files = ['Monitor', 'Tower', 'Desk'];
 
@@ -117,6 +117,7 @@ function init(){
     
     onWindowResize();
 } 
+
 function onWindowResize(event){
     renderer.setSize(window.innerWidth, window.innerHeight);
     uniforms.u_resolution.value.x = renderer.domElement.width;
@@ -126,7 +127,6 @@ function onWindowResize(event){
 function animate(time){
     renderer.render(scene, camera);
 }
-
 
 function createObject(x, y, obj){
 
